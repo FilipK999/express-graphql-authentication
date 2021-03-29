@@ -1,7 +1,42 @@
+scalar Timestamp
+
 type Query {
-  hello: Hello
+  hello(text: String): Hello
 }
 
 type Hello {
-  message: String
+  message: String!
 }
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  login(input: LoginInput!): MutationResult!
+}
+
+type User {
+  email: String!
+  username: String!
+  password: String!
+  created: Timestamp!
+  updated: Timestamp!
+}
+
+input CreateUserInput {
+  email: String!
+  username: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type MutationResult {
+  success: Boolean!
+  error: String
+}
+
+# type LoginMutationResult implements MutationResult {
+
+# }

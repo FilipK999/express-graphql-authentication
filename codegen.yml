@@ -1,11 +1,13 @@
 overwrite: true
 schema: "./src/schema/schema.graphql"
-documents: null
 generates:
   src/schema/schema.ts:
     plugins:
       - "typescript"
-      # - "typescript-resolvers"
-  ./graphql.schema.json:
-    plugins:
-      - "introspection"
+      - "typescript-resolvers"
+      - "typescript-operations"
+    config:
+      contextType: src/types#Context
+      useIndexSignature: true
+      scalars:
+        Timestamp: string
