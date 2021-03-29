@@ -58,6 +58,7 @@ export type MutationResult = {
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<User>;
+  logout: MutationResult;
 };
 
 
@@ -198,6 +199,7 @@ export type MutationResultResolvers<ContextType = Context, ParentType extends Re
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  logout?: Resolver<ResolversTypes['MutationResult'], ParentType, ContextType>;
 }>;
 
 export interface TimestampScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Timestamp'], any> {

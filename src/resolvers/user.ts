@@ -15,6 +15,10 @@ export const userResolver: Resolvers = {
       console.log(user!.id);
       return user;
     },
+    logout: (_, __, { req }) => {
+      req.session!.userId = undefined;
+      return { success: true };
+    },
   },
   Mutation: {
     createUser: async (_, args, { prisma, req }) => {

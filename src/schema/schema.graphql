@@ -3,6 +3,7 @@ scalar id
 
 type Query {
   me: User
+  logout: MutationResult!
 }
 
 type Mutation {
