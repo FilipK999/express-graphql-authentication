@@ -1,12 +1,8 @@
 scalar Timestamp
-scalar JSON
+scalar id
 
 type Query {
-  hello(text: String): Hello
-}
-
-type Hello {
-  message: String!
+  me: User
 }
 
 type Mutation {
@@ -15,6 +11,7 @@ type Mutation {
 }
 
 type User {
+  id: id!
   email: String!
   username: String!
   password: String!

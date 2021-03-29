@@ -2,16 +2,29 @@ import { CreateUserInput, Resolvers } from "../schema/schema";
 import argon2 from "argon2";
 import { PrismaClient } from ".prisma/client";
 
-export const userResolvers: Resolvers = {
+export const userResolver: Resolvers = {
+  Query: {
+    me: async (_, __, { req, prisma }) => {
+      if (!req.session.userId) return null;
+
+      const user = await prisma.user.findFirst({
+        where: {
+          id: req.session.userId,
+        },
+      });
+      console.log(user!.id);
+      return user;
+    },
+  },
   Mutation: {
-    createUser: async (_, args, { prisma }) => {
+    createUser: async (_, args, { prisma, req }) => {
       const validation = await validate(args.input, prisma);
 
       if (validation) return validation;
 
       const hash = await argon2.hash(args.input.password);
 
-      await prisma.user.create({
+      const user = await prisma.user.create({
         data: {
           email: args.input.email,
           username: args.input.username,
@@ -21,11 +34,14 @@ export const userResolvers: Resolvers = {
         },
       });
 
+      // automatically log user in
+      req.session!.userId = user.id;
       return {
         success: true,
       };
     },
-    login: async (_, args, { prisma }) => {
+
+    login: async (_, args, { prisma, req }) => {
       const user = await prisma.user.findFirst({
         where: {
           email: args.input.email,
@@ -44,7 +60,11 @@ export const userResolvers: Resolvers = {
         args.input.password
       );
 
-      if (passwordMatch) return { success: true };
+      if (passwordMatch) {
+        // Add user id to session which logs them in
+        req.session!.userId = user.id;
+        return { success: true };
+      }
 
       return {
         success: false,

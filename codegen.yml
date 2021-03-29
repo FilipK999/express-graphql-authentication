@@ -11,4 +11,4 @@ generates:
       useIndexSignature: true
       scalars:
         Timestamp: string
-        JSON: JSON
+        id: number

@@ -12,8 +12,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  JSON: JSON;
   Timestamp: string;
+  id: number;
 };
 
 export type CreateUserInput = {
@@ -27,12 +27,6 @@ export type Error = {
   field: Scalars['String'];
   message: Scalars['String'];
 };
-
-export type Hello = {
-  __typename?: 'Hello';
-  message: Scalars['String'];
-};
-
 
 export type LoginInput = {
   email: Scalars['String'];
@@ -63,23 +57,20 @@ export type MutationResult = {
 
 export type Query = {
   __typename?: 'Query';
-  hello?: Maybe<Hello>;
-};
-
-
-export type QueryHelloArgs = {
-  text?: Maybe<Scalars['String']>;
+  me?: Maybe<User>;
 };
 
 
 export type User = {
   __typename?: 'User';
+  id: Scalars['id'];
   email: Scalars['String'];
   username: Scalars['String'];
   password: Scalars['String'];
   created: Scalars['Timestamp'];
   updated: Scalars['Timestamp'];
 };
+
 
 export type WithIndex<TObject> = TObject & Record<string, any>;
 export type ResolversObject<TObject> = WithIndex<TObject>;
@@ -163,8 +154,6 @@ export type ResolversTypes = ResolversObject<{
   CreateUserInput: CreateUserInput;
   String: ResolverTypeWrapper<Scalars['String']>;
   Error: ResolverTypeWrapper<Error>;
-  Hello: ResolverTypeWrapper<Hello>;
-  JSON: ResolverTypeWrapper<Scalars['JSON']>;
   LoginInput: LoginInput;
   Mutation: ResolverTypeWrapper<{}>;
   MutationResult: ResolverTypeWrapper<MutationResult>;
@@ -172,6 +161,7 @@ export type ResolversTypes = ResolversObject<{
   Query: ResolverTypeWrapper<{}>;
   Timestamp: ResolverTypeWrapper<Scalars['Timestamp']>;
   User: ResolverTypeWrapper<User>;
+  id: ResolverTypeWrapper<Scalars['id']>;
 }>;
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -179,8 +169,6 @@ export type ResolversParentTypes = ResolversObject<{
   CreateUserInput: CreateUserInput;
   String: Scalars['String'];
   Error: Error;
-  Hello: Hello;
-  JSON: Scalars['JSON'];
   LoginInput: LoginInput;
   Mutation: {};
   MutationResult: MutationResult;
@@ -188,6 +176,7 @@ export type ResolversParentTypes = ResolversObject<{
   Query: {};
   Timestamp: Scalars['Timestamp'];
   User: User;
+  id: Scalars['id'];
 }>;
 
 export type ErrorResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = ResolversObject<{
@@ -195,15 +184,6 @@ export type ErrorResolvers<ContextType = Context, ParentType extends ResolversPa
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
-
-export type HelloResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Hello'] = ResolversParentTypes['Hello']> = ResolversObject<{
-  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-}>;
-
-export interface JsonScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['JSON'], any> {
-  name: 'JSON';
-}
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   createUser?: Resolver<ResolversTypes['MutationResult'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
@@ -217,7 +197,7 @@ export type MutationResultResolvers<ContextType = Context, ParentType extends Re
 }>;
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
-  hello?: Resolver<Maybe<ResolversTypes['Hello']>, ParentType, ContextType, RequireFields<QueryHelloArgs, never>>;
+  me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
 }>;
 
 export interface TimestampScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Timestamp'], any> {
@@ -225,6 +205,7 @@ export interface TimestampScalarConfig extends GraphQLScalarTypeConfig<Resolvers
 }
 
 export type UserResolvers<ContextType = Context, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = ResolversObject<{
+  id?: Resolver<ResolversTypes['id'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   password?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -233,15 +214,18 @@ export type UserResolvers<ContextType = Context, ParentType extends ResolversPar
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 
+export interface IdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['id'], any> {
+  name: 'id';
+}
+
 export type Resolvers<ContextType = Context> = ResolversObject<{
   Error?: ErrorResolvers<ContextType>;
-  Hello?: HelloResolvers<ContextType>;
-  JSON?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   MutationResult?: MutationResultResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Timestamp?: GraphQLScalarType;
   User?: UserResolvers<ContextType>;
+  id?: GraphQLScalarType;
 }>;
 
 
