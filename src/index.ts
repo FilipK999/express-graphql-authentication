@@ -2,7 +2,7 @@ import { ApolloServer } from "apollo-server-express";
 import { loadSchemaSync } from "@graphql-tools/load";
 import { GraphQLFileLoader } from "@graphql-tools/graphql-file-loader";
 import { join } from "path";
-import { resolvers } from "./resolvers/resolvers";
+import resolvers from "./resolvers";
 import { Context } from "./types";
 import "reflect-metadata";
 import { PrismaClient } from "@prisma/client";
