@@ -8,8 +8,10 @@ Steps to run:
 
 2. Create your .env file
 
-3. prisma db pull; prisma generate
+3. yarn
 
-4. Start Redis
+4. yarn prisma db pull; yarn prisma generate
 
-5. yarn && yarn start
+5. Start Redis
+
+6. yarn start
