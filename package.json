@@ -22,6 +22,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "graphql": "^15.5.0",
+    "jsonwebtoken": "^8.5.1",
     "pg": "^8.5.1",
     "prisma": "2.19.0",
     "redis": "^3.0.2",

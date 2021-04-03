@@ -33,13 +33,10 @@ input LoginInput {
 
 type MutationResult {
   success: Boolean!
-  errors: [Error]
+  errors: [Error!]
 }
 
 type Error {
   field: String!
   message: String!
 }
-# type RegisterMutationResult implements MutationResult {
-
-# }
