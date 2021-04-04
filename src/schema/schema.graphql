@@ -3,12 +3,12 @@ scalar id
 
 type Query {
   me: User
-  logout: MutationResult!
 }
 
 type Mutation {
   register(input: RegisterInput!): MutationResult!
   login(input: LoginInput!): MutationResult!
+  logout: MutationResult!
 }
 
 type User {

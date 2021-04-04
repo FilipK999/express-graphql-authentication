@@ -31,6 +31,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   register: MutationResult;
   login: MutationResult;
+  logout: MutationResult;
 };
 
 
@@ -52,7 +53,6 @@ export type MutationResult = {
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<User>;
-  logout: MutationResult;
 };
 
 export type RegisterInput = {
@@ -189,6 +189,7 @@ export type ErrorResolvers<ContextType = Context, ParentType extends ResolversPa
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
   register?: Resolver<ResolversTypes['MutationResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'input'>>;
   login?: Resolver<ResolversTypes['MutationResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
+  logout?: Resolver<ResolversTypes['MutationResult'], ParentType, ContextType>;
 }>;
 
 export type MutationResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['MutationResult'] = ResolversParentTypes['MutationResult']> = ResolversObject<{
@@ -199,7 +200,6 @@ export type MutationResultResolvers<ContextType = Context, ParentType extends Re
 
 export type QueryResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = ResolversObject<{
   me?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
-  logout?: Resolver<ResolversTypes['MutationResult'], ParentType, ContextType>;
 }>;
 
 export interface TimestampScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Timestamp'], any> {

@@ -4,6 +4,7 @@ import { GraphQLFileLoader } from "@graphql-tools/graphql-file-loader";
 import { join } from "path";
 import resolvers from "./resolvers";
 import { Context } from "./types";
+import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 import express from "express";
 import { __prod__ } from "./constants";
@@ -14,6 +15,12 @@ const app = express();
 const port = 4000;
 export const prisma = new PrismaClient();
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 
@@ -36,7 +43,7 @@ const apolloServer = new ApolloServer({
   },
 });
 
-apolloServer.applyMiddleware({ app, cors: { origin: "*" } });
+apolloServer.applyMiddleware({ app, cors: false });
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);

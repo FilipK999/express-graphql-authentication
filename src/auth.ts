@@ -48,7 +48,7 @@ export const createUserContext = async (
     return null;
   }
 
-  let data;
+  let data: { userId: number };
 
   try {
     data = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET!) as any;
@@ -79,9 +79,11 @@ export const setAuthCookies = (
   res.cookie("a-token", tokens.accessToken, {
     expires: new Date(Date.now() + 60 * 1000 * 10), // 10 min
     secure: __prod__,
+    httpOnly: true,
   });
   res.cookie("r-token", tokens.refreshToken, {
     expires: new Date(Date.now() + 60 * 1000 * 60 * 24 * 7), // 7 days
     secure: __prod__,
+    httpOnly: true,
   });
 };

@@ -12,11 +12,6 @@ export const userResolver: Resolvers = {
       }
       return user;
     },
-    logout: (_, __, { res }) => {
-      res.clearCookie("a-token");
-      res.clearCookie("r-token");
-      return { success: true };
-    },
   },
   Mutation: {
     register: async (_, args, { prisma, res }) => {
@@ -42,7 +37,6 @@ export const userResolver: Resolvers = {
         success: true,
       };
     },
-
     login: async (_, args, { prisma, res }) => {
       const user = await prisma.user.findFirst({
         where: {
@@ -73,6 +67,11 @@ export const userResolver: Resolvers = {
         success: false,
         errors: [{ field: "password", message: "Wrong password" }],
       };
+    },
+    logout: (_, __, { res }) => {
+      res.clearCookie("a-token");
+      res.clearCookie("r-token");
+      return { success: true };
     },
   },
 };
