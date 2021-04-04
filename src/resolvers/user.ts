@@ -1,29 +1,26 @@
-import { CreateUserInput, Resolvers } from "../schema/schema";
-import argon2 from "argon2";
 import { PrismaClient } from ".prisma/client";
+import argon2 from "argon2";
+import { __prod__ } from "../constants";
+import { RegisterInput, Resolvers } from "../schema/schema";
+import { setAuthCookies, createTokens } from "../auth";
 
 export const userResolver: Resolvers = {
   Query: {
-    me: async (_, __, { req, prisma }) => {
-      if (!req.session.userId) return null;
-
-      const user = await prisma.user.findFirst({
-        where: {
-          id: req.session.userId,
-        },
-      });
-      console.log(user!.id);
+    me: async (_, __, { user }) => {
+      if (!user) {
+        return null;
+      }
       return user;
     },
-    logout: (_, __, { req }) => {
-      req.session!.userId = undefined;
+    logout: (_, __, { res }) => {
+      res.clearCookie("a-token");
+      res.clearCookie("r-token");
       return { success: true };
     },
   },
   Mutation: {
-    createUser: async (_, args, { prisma, req }) => {
+    register: async (_, args, { prisma, res }) => {
       const validation = await validate(args.input, prisma);
-
       if (validation) return validation;
 
       const hash = await argon2.hash(args.input.password);
@@ -38,14 +35,15 @@ export const userResolver: Resolvers = {
         },
       });
 
-      // automatically log user in
-      req.session!.userId = user.id;
+      const { accessToken, refreshToken } = createTokens(user);
+      setAuthCookies(res, { accessToken, refreshToken });
+
       return {
         success: true,
       };
     },
 
-    login: async (_, args, { prisma, req }) => {
+    login: async (_, args, { prisma, res }) => {
       const user = await prisma.user.findFirst({
         where: {
           email: args.input.email,
@@ -65,8 +63,9 @@ export const userResolver: Resolvers = {
       );
 
       if (passwordMatch) {
-        // Add user id to session which logs them in
-        req.session!.userId = user.id;
+        const { accessToken, refreshToken } = createTokens(user);
+        setAuthCookies(res, { accessToken, refreshToken });
+
         return { success: true };
       }
 
@@ -78,7 +77,7 @@ export const userResolver: Resolvers = {
   },
 };
 
-const validate = async (input: CreateUserInput, prisma: PrismaClient) => {
+const validate = async (input: RegisterInput, prisma: PrismaClient) => {
   if (input.password.length < 6)
     return {
       success: false,
@@ -104,6 +103,7 @@ const validate = async (input: CreateUserInput, prisma: PrismaClient) => {
   if (testUsername)
     return {
       success: false,
+
       errors: [
         {
           field: "username",

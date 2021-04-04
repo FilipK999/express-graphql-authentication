@@ -16,12 +16,6 @@ export type Scalars = {
   id: number;
 };
 
-export type CreateUserInput = {
-  email: Scalars['String'];
-  username: Scalars['String'];
-  password: Scalars['String'];
-};
-
 export type Error = {
   __typename?: 'Error';
   field: Scalars['String'];
@@ -35,13 +29,13 @@ export type LoginInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createUser: MutationResult;
+  register: MutationResult;
   login: MutationResult;
 };
 
 
-export type MutationCreateUserArgs = {
-  input: CreateUserInput;
+export type MutationRegisterArgs = {
+  input: RegisterInput;
 };
 
 
@@ -52,13 +46,19 @@ export type MutationLoginArgs = {
 export type MutationResult = {
   __typename?: 'MutationResult';
   success: Scalars['Boolean'];
-  errors?: Maybe<Array<Maybe<Error>>>;
+  errors?: Maybe<Array<Error>>;
 };
 
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<User>;
   logout: MutationResult;
+};
+
+export type RegisterInput = {
+  email: Scalars['String'];
+  username: Scalars['String'];
+  password: Scalars['String'];
 };
 
 
@@ -152,14 +152,14 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = ResolversObject<{
-  CreateUserInput: CreateUserInput;
-  String: ResolverTypeWrapper<Scalars['String']>;
   Error: ResolverTypeWrapper<Error>;
+  String: ResolverTypeWrapper<Scalars['String']>;
   LoginInput: LoginInput;
   Mutation: ResolverTypeWrapper<{}>;
   MutationResult: ResolverTypeWrapper<MutationResult>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Query: ResolverTypeWrapper<{}>;
+  RegisterInput: RegisterInput;
   Timestamp: ResolverTypeWrapper<Scalars['Timestamp']>;
   User: ResolverTypeWrapper<User>;
   id: ResolverTypeWrapper<Scalars['id']>;
@@ -167,14 +167,14 @@ export type ResolversTypes = ResolversObject<{
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = ResolversObject<{
-  CreateUserInput: CreateUserInput;
-  String: Scalars['String'];
   Error: Error;
+  String: Scalars['String'];
   LoginInput: LoginInput;
   Mutation: {};
   MutationResult: MutationResult;
   Boolean: Scalars['Boolean'];
   Query: {};
+  RegisterInput: RegisterInput;
   Timestamp: Scalars['Timestamp'];
   User: User;
   id: Scalars['id'];
@@ -187,13 +187,13 @@ export type ErrorResolvers<ContextType = Context, ParentType extends ResolversPa
 }>;
 
 export type MutationResolvers<ContextType = Context, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = ResolversObject<{
-  createUser?: Resolver<ResolversTypes['MutationResult'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'input'>>;
+  register?: Resolver<ResolversTypes['MutationResult'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'input'>>;
   login?: Resolver<ResolversTypes['MutationResult'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
 }>;
 
 export type MutationResultResolvers<ContextType = Context, ParentType extends ResolversParentTypes['MutationResult'] = ResolversParentTypes['MutationResult']> = ResolversObject<{
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  errors?: Resolver<Maybe<Array<Maybe<ResolversTypes['Error']>>>, ParentType, ContextType>;
+  errors?: Resolver<Maybe<Array<ResolversTypes['Error']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 }>;
 

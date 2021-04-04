@@ -7,7 +7,7 @@ type Query {
 }
 
 type Mutation {
-  createUser(input: CreateUserInput!): MutationResult!
+  register(input: RegisterInput!): MutationResult!
   login(input: LoginInput!): MutationResult!
 }
 
@@ -20,7 +20,7 @@ type User {
   updated: Timestamp!
 }
 
-input CreateUserInput {
+input RegisterInput {
   email: String!
   username: String!
   password: String!

@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import session from "express-session";
+import { User } from "./schema/schema";
 
 export type Context = {
-  req: Request & { session: session.Session & { userId?: number } };
+  req: Request;
   res: Response;
   prisma: PrismaClient;
+  user: User | null;
 };
