@@ -37,7 +37,22 @@ export const userResolver: Resolvers = {
         success: true,
       };
     },
+
     login: async (_, args, { prisma, res }) => {
+      const trimmedEmail = args.input.email.trim();
+
+      if (trimmedEmail === "") {
+        return {
+          success: false,
+          errors: [
+            {
+              field: "email",
+              message: "This field is required",
+            },
+          ],
+        };
+      }
+
       const user = await prisma.user.findFirst({
         where: {
           email: args.input.email,
@@ -47,7 +62,9 @@ export const userResolver: Resolvers = {
       if (!user) {
         return {
           success: false,
-          errors: [{ field: "email", message: "Email doesn't exist" }],
+          errors: [
+            { field: "email", message: "User with this email doesn't exist" },
+          ],
         };
       }
 
@@ -77,6 +94,31 @@ export const userResolver: Resolvers = {
 };
 
 const validate = async (input: RegisterInput, prisma: PrismaClient) => {
+  const trimmedEmail = input.email.trim();
+  const trimmedUsername = input.username.trim();
+
+  if (trimmedUsername === "") {
+    return {
+      success: false,
+      errors: [
+        {
+          field: "username",
+          message: "This field is required",
+        },
+      ],
+    };
+  }
+  if (trimmedEmail === "") {
+    return {
+      success: false,
+      errors: [
+        {
+          field: "email",
+          message: "This field is required",
+        },
+      ],
+    };
+  }
   if (input.password.length < 6)
     return {
       success: false,

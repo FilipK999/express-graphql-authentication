@@ -48,7 +48,7 @@ export const createUserContext = async (
     return null;
   }
 
-  let data: { userId: number };
+  let data;
 
   try {
     data = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET!) as any;
