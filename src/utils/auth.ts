@@ -1,4 +1,4 @@
-import { User } from "./schema/schema";
+import { User } from "../schema/schema";
 import jwt from "jsonwebtoken";
 import {
   ACCESS_TOKEN_SECRET,

@@ -3,13 +3,13 @@ import { loadSchemaSync } from "@graphql-tools/load";
 import { GraphQLFileLoader } from "@graphql-tools/graphql-file-loader";
 import { join } from "path";
 import resolvers from "./resolvers";
-import { Context } from "./types";
+import { Context } from "./utils/types";
 import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 import express from "express";
-import { __prod__ } from "./constants";
+import { __prod__ } from "./utils/constants";
 import cookieParser from "cookie-parser";
-import { createUserContext } from "./auth";
+import { createUserContext } from "./utils/auth";
 
 const app = express();
 const port = 4000;

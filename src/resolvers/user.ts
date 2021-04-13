@@ -1,8 +1,9 @@
 import { PrismaClient } from ".prisma/client";
 import argon2 from "argon2";
-import { __prod__ } from "../constants";
-import { RegisterInput, Resolvers } from "../schema/schema";
-import { setAuthCookies, createTokens } from "../auth";
+import { __prod__ } from "../utils/constants";
+import { LoginInput, RegisterInput, Resolvers } from "../schema/schema";
+import { setAuthCookies, createTokens } from "../utils/auth";
+import validator from "validator";
 
 export const userResolver: Resolvers = {
   Query: {
@@ -15,14 +16,14 @@ export const userResolver: Resolvers = {
   },
   Mutation: {
     register: async (_, args, { prisma, res }) => {
-      const validation = await validate(args.input, prisma);
+      const validation = await validateRegistration(args.input, prisma);
       if (validation) return validation;
 
       const hash = await argon2.hash(args.input.password);
 
       const user = await prisma.user.create({
         data: {
-          email: args.input.email,
+          email: args.input.email.trim(),
           username: args.input.username,
           password: hash,
           created: Date.now().toString(),
@@ -33,58 +34,25 @@ export const userResolver: Resolvers = {
       const { accessToken, refreshToken } = createTokens(user);
       setAuthCookies(res, { accessToken, refreshToken });
 
-      return {
-        success: true,
-      };
+      return { success: true };
     },
 
     login: async (_, args, { prisma, res }) => {
-      const trimmedEmail = args.input.email.trim();
-
-      if (trimmedEmail === "") {
-        return {
-          success: false,
-          errors: [
-            {
-              field: "email",
-              message: "This field is required",
-            },
-          ],
-        };
-      }
+      const validation = await validateLogin(args.input, prisma);
+      if (validation) return validation;
 
       const user = await prisma.user.findFirst({
         where: {
-          email: args.input.email,
+          email: args.input.email.trim(),
         },
       });
 
-      if (!user) {
-        return {
-          success: false,
-          errors: [
-            { field: "email", message: "User with this email doesn't exist" },
-          ],
-        };
-      }
+      const { accessToken, refreshToken } = createTokens(user!);
+      setAuthCookies(res, { accessToken, refreshToken });
 
-      const passwordMatch = await argon2.verify(
-        user?.password!,
-        args.input.password
-      );
-
-      if (passwordMatch) {
-        const { accessToken, refreshToken } = createTokens(user);
-        setAuthCookies(res, { accessToken, refreshToken });
-
-        return { success: true };
-      }
-
-      return {
-        success: false,
-        errors: [{ field: "password", message: "Wrong password" }],
-      };
+      return { success: true };
     },
+
     logout: (_, __, { res }) => {
       res.clearCookie("a-token");
       res.clearCookie("r-token");
@@ -93,11 +61,14 @@ export const userResolver: Resolvers = {
   },
 };
 
-const validate = async (input: RegisterInput, prisma: PrismaClient) => {
-  const trimmedEmail = input.email.trim();
+const validateRegistration = async (
+  input: RegisterInput,
+  prisma: PrismaClient
+) => {
+  const trimmedEmail = input.email.toLowerCase().trim();
   const trimmedUsername = input.username.trim();
 
-  if (trimmedUsername === "") {
+  if (validator.isEmpty(trimmedUsername)) {
     return {
       success: false,
       errors: [
@@ -108,7 +79,8 @@ const validate = async (input: RegisterInput, prisma: PrismaClient) => {
       ],
     };
   }
-  if (trimmedEmail === "") {
+
+  if (validator.isEmpty(trimmedEmail)) {
     return {
       success: false,
       errors: [
@@ -119,6 +91,19 @@ const validate = async (input: RegisterInput, prisma: PrismaClient) => {
       ],
     };
   }
+
+  if (!validator.isEmail(trimmedEmail)) {
+    return {
+      success: false,
+      errors: [
+        {
+          field: "email",
+          message: "Please provide a valid email",
+        },
+      ],
+    };
+  }
+
   if (input.password.length < 6)
     return {
       success: false,
@@ -130,18 +115,18 @@ const validate = async (input: RegisterInput, prisma: PrismaClient) => {
       ],
     };
 
-  const testUsername = await prisma.user.findFirst({
+  const usernameExists = await prisma.user.findFirst({
     where: {
       username: input.username,
     },
   });
-  const testEmail = await prisma.user.findFirst({
+  const emailExists = await prisma.user.findFirst({
     where: {
       email: input.email,
     },
   });
 
-  if (testUsername)
+  if (usernameExists)
     return {
       success: false,
 
@@ -153,7 +138,7 @@ const validate = async (input: RegisterInput, prisma: PrismaClient) => {
       ],
     };
 
-  if (testEmail)
+  if (emailExists)
     return {
       success: false,
       errors: [
@@ -164,5 +149,71 @@ const validate = async (input: RegisterInput, prisma: PrismaClient) => {
       ],
     };
 
+  return null;
+};
+
+const validateLogin = async (input: LoginInput, prisma: PrismaClient) => {
+  const trimmedEmail = input.email.trim();
+  const password = input.password;
+
+  if (!validator.isEmail(trimmedEmail)) {
+    return {
+      success: false,
+      errors: [
+        {
+          field: "email",
+          message: "Please provide a valid email",
+        },
+      ],
+    };
+  }
+
+  if (validator.isEmpty(trimmedEmail)) {
+    return {
+      success: false,
+      errors: [
+        {
+          field: "email",
+          message: "This field is required",
+        },
+      ],
+    };
+  }
+
+  if (validator.isEmpty(password)) {
+    return {
+      success: false,
+      errors: [
+        {
+          field: "password",
+          message: "This field is required",
+        },
+      ],
+    };
+  }
+
+  const user = await prisma.user.findFirst({
+    where: {
+      email: trimmedEmail,
+    },
+  });
+
+  if (!user) {
+    return {
+      success: false,
+      errors: [
+        { field: "email", message: "User with this email doesn't exist" },
+      ],
+    };
+  }
+
+  const passwordMatch = await argon2.verify(user?.password!, input.password);
+
+  if (!passwordMatch) {
+    return {
+      success: false,
+      errors: [{ field: "password", message: "Wrong password" }],
+    };
+  }
   return null;
 };
