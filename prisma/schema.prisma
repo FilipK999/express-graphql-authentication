@@ -9,9 +9,10 @@ datasource db {
 
 model User {
   id       Int    @id @default(autoincrement())
-  username String @db.VarChar(256)
-  email    String @db.VarChar(256)
-  password String @db.VarChar(256)
+  username String @db.VarChar(255)
+  email    String @db.VarChar(255)
+  password String @db.VarChar(255)
   created  String @db.VarChar(16)
   updated  String @db.VarChar(16)
 }
+
